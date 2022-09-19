@@ -41,8 +41,9 @@ public class Pomodoro {
         int breakMin = 5; //Время отдыха
         int count = 1; //Количество подходов
         boolean isCallHelp = false;
-        int i = 0;
+        int sizePrint = 30;
 
+        int i = 0;
         for(i=0; i<cmd.length; i++) {
             switch(cmd[i]) {
                 case "-help" -> {
@@ -56,8 +57,17 @@ public class Pomodoro {
         }
         if (!isCallHelp) {
             System.out.printf("Параметры программы: Работаем %d минут, " +
-                    "отдыхаем %d минут, количество повторений - %d", workMin, breakMin, count);
+                    "отдыхаем %d минут, количество повторений - %d\n\n", workMin, breakMin, count);
         }
+        long startTime = System.currentTimeMillis();
+
+        long endTime = System.currentTimeMillis();
+
+        System.out.println("Прошло " + (endTime - startTime)/(1000*60) + " минут");
+    }
+
+    private static void timer(int workTime, int breakTime, int sizeProgressBar) {
+
     }
 
     private static void helpMessage() {
