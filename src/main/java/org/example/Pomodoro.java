@@ -36,17 +36,20 @@ public class Pomodoro {
                 System.out.println("Среди команд отсутствует команда -count. Повторите ввод.");
                 continue;
             }
+            if (!Arrays.asList(cmd).contains("-m")) {
+                System.out.println("Среди команд отсутствует команда -m. Повторите ввод.");
+                continue;
+            }
             validationCheck = true;
         }
         while (!validationCheck);
 
-        int workMin = 25; //Время работы
-        int breakMin = 5; //Время отдыха
-        int count = 1; //Количество подходов
+        int workMin = 25; // Время работы
+        int breakMin = 5; // Время отдыха
+        int count = 1; // Количество подходов
+        int multiplier = 1; // Множитель
         boolean isCallHelp = false;
         int sizePrint = 30;
-
-
 
         int i = 0;
         for(i=0; i<cmd.length; i++) {
@@ -58,6 +61,7 @@ public class Pomodoro {
                 case "-w" -> workMin = Integer.parseInt(cmd[++i]);
                 case "-b" -> breakMin = Integer.parseInt(cmd[++i]);
                 case "-count" -> count = Integer.parseInt(cmd[++i]);
+                case "-m" -> multiplier = Integer.parseInt(cmd[++i]);
                 case "-t" -> istest = true;
             }
         }
@@ -68,7 +72,7 @@ public class Pomodoro {
         }
         long startTime = System.currentTimeMillis();
         for(i = 1; i <= count; i++) {
-            timer(workMin, breakMin, sizePrint);
+            timer(workMin * (int) Math.pow(multiplier, (i-1)), breakMin, sizePrint);
         }
         long endTime = System.currentTimeMillis();
 
