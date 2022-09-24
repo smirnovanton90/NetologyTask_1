@@ -2,10 +2,13 @@ package org.example;
 
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 public class Pomodoro {
 
-    public static void main(String[] args) {
+    static boolean istest = false;
+
+    public static void main(String[] args) throws InterruptedException {
 
         /*
         -w 1 -b 1 -count 1
@@ -43,6 +46,8 @@ public class Pomodoro {
         boolean isCallHelp = false;
         int sizePrint = 30;
 
+
+
         int i = 0;
         for(i=0; i<cmd.length; i++) {
             switch(cmd[i]) {
@@ -53,21 +58,78 @@ public class Pomodoro {
                 case "-w" -> workMin = Integer.parseInt(cmd[++i]);
                 case "-b" -> breakMin = Integer.parseInt(cmd[++i]);
                 case "-count" -> count = Integer.parseInt(cmd[++i]);
+                case "-t" -> istest = true;
             }
         }
         if (!isCallHelp) {
-            System.out.printf("Параметры программы: Работаем %d минут, " +
-                    "отдыхаем %d минут, количество повторений - %d\n\n", workMin, breakMin, count);
+            System.out.printf("Параметры программы: Работаем %d минут" + endingCalculation(workMin % 10, 1) + ", " +
+                    "отдыхаем %d минут" + endingCalculation(workMin % 10, 1) +
+                    ", количество повторений - %d\n\n", workMin, breakMin, count);
         }
         long startTime = System.currentTimeMillis();
-
+        for(i = 1; i <= count; i++) {
+            timer(workMin, breakMin, sizePrint);
+        }
         long endTime = System.currentTimeMillis();
 
-        System.out.println("Прошло " + (endTime - startTime)/(1000*60) + " минут");
+        long passedMin = (endTime - startTime) / (1000 * 60);
+        System.out.println("Прошло " + passedMin + " минут" + endingCalculation(passedMin, 2));
     }
 
-    private static void timer(int workTime, int breakTime, int sizeProgressBar) {
+    private static void timer(int workTime, int breakTime, int sizeProgressBar) throws InterruptedException {
+        printProgress ("Время вкалывать: ", workTime, sizeProgressBar);
+        printProgress ("Время отдыхать: ", breakTime, sizeProgressBar);
+    }
 
+    private static String endingCalculation(long number, int order) throws InterruptedException {
+
+        String ending = "";
+
+        //Если в разряде десятков - единица (например, с 10 до 19, со 110 до 119 и т.д.), то окончание отсутствует
+        if ((number % 100) >= 10 && (number % 100) < 20) {
+            ending = "";
+        }
+
+        //В остальных случаях окончание зависит от последней цифры
+         switch ((int) number) {
+            case 1 -> {
+                if (order == 1) {
+                    ending = "у";
+                }
+                if (order == 2) {
+                    ending = "а";
+                }
+            }
+            case 2, 3, 4 -> ending = "ы";
+            default -> ending = "";
+        }
+        return ending;
+    }
+
+    private static void printProgress(String process, int time, int size) throws InterruptedException {
+        int length = 60 * time / size;
+        int rep = 60 * time / length;
+        int stretchb = size / (3 * time);
+        for (int i = 1; i<=rep; i++) {
+            double x = i;
+            x = 1.0 / 3.0 * x;
+            x *= 10;
+            x = Math.round(x);
+            x /= 10;
+            double w = time * stretchb;
+            double percent = (x / w) * 1000;
+            x /= stretchb;
+            x *=10;
+            x = Math.round(x);
+            x /= 10;
+            percent = Math.round(percent);
+            percent /= 10;
+            System.out.print(process + percent + "% " + (" ").repeat(5 - (String.valueOf(percent).length())) + "[" + ("#").repeat(i) + ("-").repeat(rep - i) + "]     ( " + x + "min / " + time + "min )" + "\r");
+            if (!istest) {
+                TimeUnit.SECONDS.sleep(length);
+            }
+        }
+        System.out.println();
     }
 
     private static void helpMessage() {
@@ -83,5 +145,7 @@ public class Pomodoro {
                 "     -b - время отдыха в минутах");
         System.out.println(
                 "     -count - количество повторов");
+        System.out.println(
+                "     -t - тестовый режим");
     }
 }
